@@ -12,22 +12,22 @@ engine = create_engine('sqlite:///user.db')  # user.db というデータベー�
 Base = declarative_base()  # データベースのテーブルの親です
 
 
-class User(Base):  # PythonではUserというクラスのインスタンスとしてデータを扱います
-    __tablename__ = 'users'  # テーブル名は users です
+class Content(Base):  # PythonではUserというクラスのインスタンスとしてデータを扱います
+    __tablename__ = 'contents'  # テーブル名は users です
     id = Column(Integer, primary_key=True, unique=True)  # 整数型のid をprimary_key として、被らないようにします
     title = Column(String)  # 文字列の emailというデータを作ります
     name = Column(String)  # 文字列の nameというデータを使います
     content = Column(String)
 
     def __repr__(self):
-        return "User<{}, {}, {}>".format(self.id, self.email, self.name)
+        return "User<{}, {}, {}>".format(self.title, self.name, self.content)
 
 Base.metadata.create_all(engine)  # 実際にデータベースを構築します
 SessionMaker = sessionmaker(bind=engine)  # Pythonとデータベースの経路です
 session = SessionMaker()  # 経路を実際に作成しました
 
-user1 = User(email="thisisme@test.com", name="Python")  # emailと nameを決めたUserのインスタンスを作りましょう(idは自動で1から順に振られます)
-session.add(user1)  # user1 をデータベースに入力するための準備をします
+content1 = Content(title="first", name="Python", content="hi")  # emailと nameを決めたUserのインスタンスを作りましょう(idは自動で1から順に振られます)
+session.add(content1)  # user1 をデータベースに入力するための準備をします
 session.commit()  # 実際にデータベースにデータを入れます。
 
 @app.route('/sub_form', methods = ['GET', 'POST'])
@@ -43,7 +43,8 @@ def index():
 
 @app.route('/board')
 def board():
-    return render_template('board.html')
+    cont = session.query(Content).all()
+    return render_template('board.html', cont=cont)
 
 if __name__ =='__main__':
     app.run()
